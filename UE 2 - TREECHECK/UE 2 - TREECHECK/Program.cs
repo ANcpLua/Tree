@@ -164,7 +164,7 @@ static class Program
         
         if (args.Length != 3)
         {
-            Console.WriteLine(" Max 3 files einlesen änder die 3 oder lösch die Zeile ODER Du hast die arguments vergessen: Falls du Raider benutzt dann geh oben rechts auf edit config und bei Programmm Übergabewerte : schreib das hier rein filename.txt filename-suchbaum.txt filename-subtree.txt in diese txt files schreibst du dann die angabe rein, und speicherst die .txt files im RiderProjects 2 - TREECHECK 2 - TREECHECK bin Debug net7.0   HIER ");
+            Console.WriteLine(" Max 3 files einlesen änder die 3 oder lösch die Zeile ODER Du hast die arguments vergessen: Falls du Rider benutzt dann geh oben rechts auf edit config und bei Programmm Übergabewerte : schreib das hier rein filename.txt filename-suchbaum.txt filename-subtree.txt in diese txt files schreibst du dann die angabe rein, und speicherst die .txt files im RiderProjects 2 - TREECHECK 2 - TREECHECK bin Debug net7.0   HIER ");
             return;
         }
         // Process the first file 
