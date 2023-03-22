@@ -14,7 +14,7 @@ Manual:
 4. search for program arguments and write filename.txt filename-suchbaum.txt filename-subtree.txt into it
 5. Click apply and press CTRL+F5
 
-The programm should now work and display results into the terminal, if you want to change the keys change the integers inside filename-subtree.txt
+The programm should now work and display results into the terminal, if you want to change the keys change the integers(keep the format \n) inside filename-subtree.txt
 
 
 Any questions you can contact me on Discord Alex22#8812
