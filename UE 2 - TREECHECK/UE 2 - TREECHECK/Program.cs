@@ -1,31 +1,30 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+
+
 
 class TreeNode
 {
     public int Key;
-    public TreeNode Left;
-    public TreeNode Right;
+    public TreeNode? Left;
+    public TreeNode? Right;
 }
 
 class BinaryTree
 {
-    public TreeNode Root;
+    public TreeNode? Root;
 
     public void Insert(int key)
     {
         Root = Insert(Root, key);
     }
 
-    private TreeNode Insert(TreeNode node, int key)
+    private static TreeNode? Insert(TreeNode? node, int key)
     {
         if (node == null)
         {
-            node = new TreeNode { Key = key };
+            return new TreeNode { Key = key };
         }
-        else if (key < node.Key)
+
+        if (key < node.Key)
         {
             node.Left = Insert(node.Left, key);
         }
@@ -37,7 +36,8 @@ class BinaryTree
         return node;
     }
 
-    public int Height(TreeNode node)
+
+    private int Height(TreeNode? node)
     {
         if (node == null)
         {
@@ -50,7 +50,7 @@ class BinaryTree
         return Math.Max(leftHeight, rightHeight) + 1;
     }
 
-    public int BalanceFactor(TreeNode node)
+    private int BalanceFactor(TreeNode? node)
     {
         if (node == null)
         {
@@ -59,78 +59,124 @@ class BinaryTree
 
         return Height(node.Right) - Height(node.Left);
     }
-
-    public void TraverseAndCheckAVL(TreeNode node)
-{
-    if (node == null)
-    {
-        return;
-    }
-
-    int balance = BalanceFactor(node);
-    Console.Write($"bal({node.Key}) = {balance}");
-    if (balance > 1 || balance < -1)
-    {
-        Console.Write(" (AVL violation!)");
-    }
-    Console.WriteLine();
-
-    TraverseAndCheckAVL(node.Left);
-    TraverseAndCheckAVL(node.Right);
-}
-
-    public bool IsAVL(TreeNode node)
+    
+    public void TraverseAndCheckAvl(TreeNode? node, ref bool isAVl)
     {
         if (node == null)
         {
-            return true;
+            return;
         }
+        
+        
+        TraverseAndCheckAvl(node.Right, ref isAVl);
+        TraverseAndCheckAvl(node.Left, ref isAVl);
 
         int balance = BalanceFactor(node);
-
+        Console.Write($"bal({node.Key}) = {balance}");
         if (balance > 1 || balance < -1)
+        {
+            Console.Write(" (AVL violation!)");
+            isAVl = false;
+        }
+        Console.WriteLine();
+        
+
+    }
+
+    public List<int> TraverseAndCollectKeys(TreeNode? node)
+    {
+        if (node == null)
+        {
+            return new List<int>();
+        }
+
+        return TraverseAndCollectKeys(node.Left)
+            .Concat(new[] { node.Key })
+            .Concat(TraverseAndCollectKeys(node.Right))
+            .ToList();
+    }
+
+
+
+    public static bool PrintPathToKey(TreeNode? node, int key, List<int>? path = null)
+    {
+        if (node == null)
         {
             return false;
         }
 
-        return IsAVL(node.Left) && IsAVL(node.Right);
-    }
+        path ??= new List<int>();
 
-    public List<int> TraverseAndCollectKeys(TreeNode node)
-    {
-        var keys = new List<int>();
+        path.Add(node.Key);
 
-        if (node == null)
+        if (node.Key == key)
         {
-            return keys;
+            Console.WriteLine($"{key} found {string.Join(", ", path)}");
+            return true;
         }
 
-        keys.AddRange(TraverseAndCollectKeys(node.Left));
-        keys.Add(node.Key);
-        keys.AddRange(TraverseAndCollectKeys(node.Right));
+        bool foundInLeft = false;
+        bool foundInRight = false;
+        if (key < node.Key)
+        {
+            foundInLeft = PrintPathToKey(node.Left, key, path);
+        }
+        else
+        {
+            foundInRight = PrintPathToKey(node.Right, key, path);
+        }
 
-        return keys;
+        path.RemoveAt(path.Count - 1);
+
+        return foundInLeft || foundInRight;
     }
 
-    public static void PrintStats(BinaryTree tree)
+    
+    public bool CheckSubtreeStructure(TreeNode? node, List<int> subtreeStructure)
     {
-        var keys = tree.TraverseAndCollectKeys(tree.Root);
-        Console.WriteLine($"min: {keys.Min()}, max: {keys.Max()}, avg: {keys.Average():F1}");
+        if (subtreeStructure.Count == 0) 
+        {
+            return true;
+        }
+        if (node == null) 
+        {
+            return false;
+        }
+
+        int index = subtreeStructure.IndexOf(node.Key);
+        if (index == 0)
+        {
+            subtreeStructure.RemoveAt(0);
+        }
+
+        return CheckSubtreeStructure(node.Left, subtreeStructure) ||
+               CheckSubtreeStructure(node.Right, subtreeStructure);
     }
+
+    
 }
 
-class Program
+
+static class Program
 {
     static void Main(string[] args)
     {
-        if (args.Length != 1)
+        
+        if (args.Length != 3)
         {
-            Console.WriteLine("Usage: treecheck filename");
+            Console.WriteLine(" Max 3 files einlesen änder die 3 oder lösch die Zeile ODER Du hast die arguments vergessen: Falls du Raider benutzt dann geh oben rechts auf edit config und bei Programmm Übergabewerte : schreib das hier rein filename.txt filename-suchbaum.txt filename-subtree.txt in diese txt files schreibst du dann die angabe rein, und speicherst die .txt files im RiderProjects 2 - TREECHECK 2 - TREECHECK bin Debug net7.0   HIER ");
             return;
         }
+        // Process the first file 
+        ProcessFile1(args[0]);
 
-        string filename = args[0];
+        // Process the second and third file
+        ProcessFiles(args[1], args[2]);
+        ProcessFiles2(args[1], args[2]);
+    }
 
+    static void ProcessFile1(string filename)
+    {
         Console.WriteLine($"Processing file: {filename}");
 
         var tree = new BinaryTree();
@@ -138,8 +184,7 @@ class Program
         using (StreamReader reader = new StreamReader(filename))
         {
             HashSet<int> addedKeys = new HashSet<int>();
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            while (reader.ReadLine() is { } line)
             {
                 int key = int.Parse(line);
                 if (!addedKeys.Contains(key))
@@ -148,13 +193,122 @@ class Program
                     addedKeys.Add(key);
                 }
             }
-        } 
-        bool isAvl = tree.IsAVL(tree.Root);
-        Console.WriteLine("AVL: " + (isAvl ? "yes" : "no"));
-
-        tree.TraverseAndCheckAVL(tree.Root);
-
-        BinaryTree.PrintStats(tree);
+        }
+        
+        bool isAvL= true;
+        tree.TraverseAndCheckAvl(tree.Root, ref isAvL);
+        Console.WriteLine("AVL: " + (isAvL ? "yes" : "no"));
+        var keys = tree.TraverseAndCollectKeys(tree.Root);
+        Console.WriteLine($"min: {keys.Min()}, max: {keys.Max()}, avg: {keys.Average():F1}");
+        
     }
     
+    static void ProcessFiles(string subtreeFile, string suchbaumFile )
+    {
+        Console.WriteLine($"Processing subtree file: {subtreeFile}");
+        Console.WriteLine($"Processing suchbaum file: {suchbaumFile}");
+        
+
+        var mainTree = new BinaryTree();
+
+        // Read and build the suchbaum
+        using (var reader = new StreamReader(suchbaumFile))
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                var key = int.Parse(line);
+                mainTree.Insert(key);
+            }
+        }
+
+        // Read the search key from the subtree file
+        int searchKey;
+        using (var reader = new StreamReader(subtreeFile))
+        {
+            var line = reader.ReadLine();
+            if (line == null)
+            {
+                Console.WriteLine("No search key provided in the subtree file!");
+                return;
+            }
+            searchKey = int.Parse(line);
+        }
+
+        bool found = BinaryTree.PrintPathToKey(mainTree.Root, searchKey);
+        if (!found)
+        {
+            Console.WriteLine($"{searchKey} not found");
+        }
+        
+        // die auskommentierte methode ließt 1 aus noch aus, einfach mit ProcessFiles austauschen
+        
+       /* static void ProcessFiles(string subtreeFile, string suchbaumFile)             
+        {
+            Console.WriteLine($"Processing subtree file: {subtreeFile}");
+            Console.WriteLine($"Processing suchbaum file: {suchbaumFile}");
+
+            var mainTree = new BinaryTree();
+
+            // Read and build the suchbaum
+            using (StreamReader reader = new StreamReader(suchbaumFile))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    int key = int.Parse(line);
+                    mainTree.Insert(key);
+                }
+            }
+
+            // Read the search keys from the subtree file
+            List<int> searchKeys = new List<int>();
+            using (StreamReader reader = new StreamReader(subtreeFile))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    searchKeys.Add(int.Parse(line));
+                }
+            }
+
+            foreach (int searchKey in searchKeys)
+            {
+                bool found = BinaryTree.PrintPathToKey(mainTree.Root, searchKey);
+                if (!found)
+                {
+                    Console.WriteLine($"{searchKey} not found!");
+                }
+            }
+        } */
+    }
+    static void ProcessFiles2(string suchbaumFile, string subtreeFile)
+    {
+        Console.WriteLine($"Processing suchbaum file: {suchbaumFile}");
+        Console.WriteLine($"Processing subtree file: {subtreeFile}");
+        var mainTree = new BinaryTree();
+
+        // Read and build the suchbaum
+        using (StreamReader reader = new StreamReader(suchbaumFile)) 
+        {
+            while (reader.ReadLine() is { } line)
+            {
+                int key = int.Parse(line);
+                mainTree.Insert(key);
+            }
+        }
+
+        // Read search keys and subtree keys
+        string[] lines = File.ReadAllLines(subtreeFile);
+        string[] subtreeKeys = lines[0].Split(',');
+
+        // Check if subtree structure exists
+        var subtreeStructure = new List<int>();
+        foreach (string key in subtreeKeys)
+        {
+            subtreeStructure.Add(int.Parse(key));
+        }
+
+        bool subtreeFound = mainTree.CheckSubtreeStructure(mainTree.Root, subtreeStructure); 
+        Console.WriteLine(subtreeFound ? "Subtree found" : "Subtree not found!");    
+    }    
 }
