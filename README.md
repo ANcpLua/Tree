@@ -5,7 +5,9 @@ Alexander Nachtmann und Stephanie Rauscher ÜBUNG 2 - TREECHECK aka Baum lesen u
 
 After downloading the .zip extract the files, press the .exe and it should work. If it does not follow the steps below.
 
-Environment PyCharm 2022.3.3 Manual:
+Environment JetBrains Rider 2022.3.2 
+
+Manual:
 
 Download zip and drag its content into RiderProjects
 Open Rider and click on Open and select the RiderProjects\TREE-UE2-BIF-DUA-2-SS2023-ALGOS-DE-main that you draged into there
