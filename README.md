@@ -3,7 +3,6 @@
 
 Alexander Nachtmann und Stephanie Rauscher ÜBUNG 2 - TREECHECK aka Baum lesen und suchen
 
-After downloading the .zip extract the files, press the .exe and it should work. If it does not follow the steps below.
 
 Environment JetBrains Rider 2022.3.2 
 
