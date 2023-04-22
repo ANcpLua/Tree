@@ -1,7 +1,4 @@
-# TREE-UE2-BIF-DUA-2-SS2023-ALGOS-DE
-
-
-Alexander Nachtmann und Stephanie Rauscher ÜBUNG 2 - TREECHECK aka Baum lesen und suchen
+TREE
 
 ```-ALGOS-DE-main/Treealgos/bin/Debug/net7.0/Treealgos.exe filename.txt filename-suchbaum.txt filename-subtree.txt
 Processing file: filename.txt
